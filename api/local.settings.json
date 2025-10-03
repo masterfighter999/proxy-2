@@ -1,0 +1,7 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AZURE_VOICE_KEY": "<YOUR_AZURE_VOICE_KEY>",
+    "AZURE_VOICE_REGION": "<YOUR_REGION>"
+  }
+}
