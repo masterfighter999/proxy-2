@@ -1,6 +1,9 @@
 {
   "name": "azure-staticwebapp-voice-live-proxy",
   "version": "1.0.0",
+   "engines": {
+    "node": "18.x"
+  },
   "description": "Azure Static Web App backend for Voice Live API WebSocket negotiation (API key over query string).",
   "main": "index.js",
   "scripts": {},
