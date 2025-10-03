@@ -11,63 +11,43 @@
 └── README.md                   # (optional, for docs)
 
 
-// /api/negotiate/index.js//
-// Azure Static Web Apps function to negotiate with the Azure Voice Live API
-const fetch = require('node-fetch');
+/**
+ * Azure Static Web App function for Voice Live API negotiation.
+ * Returns a WebSocket URL for the Voice Live API, with model and api-version.
+ * 
+ * Environment variables:
+ *   AZURE_VOICE_LIVE_ENDPOINT (e.g. https://your-resource.voice.azure.com)
+ *   AZURE_VOICE_LIVE_API_KEY
+ *   AZURE_VOICE_LIVE_MODEL (e.g. gpt-4o)
+ */
 
 module.exports = async function (context, req) {
-    // You usually get these from environment variables
-    const AZURE_VOICE_KEY = process.env.AZURE_VOICE_KEY;
-    const AZURE_VOICE_REGION = process.env.AZURE_VOICE_REGION;
+    const AZURE_VOICE_LIVE_ENDPOINT = process.env.AZURE_VOICE_LIVE_ENDPOINT;
+    const AZURE_VOICE_LIVE_API_KEY = process.env.AZURE_VOICE_LIVE_API_KEY;
+    const AZURE_VOICE_LIVE_MODEL = process.env.AZURE_VOICE_LIVE_MODEL;
+    const API_VERSION = '2025-05-01-preview';
 
-    if (!AZURE_VOICE_KEY || !AZURE_VOICE_REGION) {
+    if (!AZURE_VOICE_LIVE_ENDPOINT || !AZURE_VOICE_LIVE_API_KEY || !AZURE_VOICE_LIVE_MODEL) {
         context.res = {
             status: 500,
-            body: "Azure Voice API KEY or REGION not configured."
+            body: "Missing Voice Live API endpoint, api-key or model."
         };
         return;
     }
 
-    // Optionally: require client authentication here if you want
-    // const userToken = req.query.token || req.headers["authorization"];
-    // if (!userToken) { ... }
-
-    // Step 1: Get an Azure Voice API access token
-    const tokenResp = await fetch(`https://${AZURE_VOICE_REGION}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, {
-        method: 'POST',
-        headers: {
-            'Ocp-Apim-Subscription-Key': AZURE_VOICE_KEY,
-            'Content-Length': '0'
-        }
-    });
-
-    if (!tokenResp.ok) {
-        context.res = {
-            status: 500,
-            body: "Failed to get Azure Voice API token"
-        };
-        return;
-    }
-
-    const token = await tokenResp.text();
-
-    // Step 2: Compose the websocket endpoint for Voice Live API
-    // (Replace with actual endpoint if needed, check docs for region-specific)
-    const wsUrl = `wss://${AZURE_VOICE_REGION}.api.speech.microsoft.com/voice/live/ws?Authorization=Bearer%20${encodeURIComponent(token)}`;
+    const wsUrl = AZURE_VOICE_LIVE_ENDPOINT
+        .replace('https://', 'wss://')
+        .replace(/\/$/, '') +
+        `/voice-live/realtime?api-version=${API_VERSION}&model=${AZURE_VOICE_LIVE_MODEL}&api-key=${encodeURIComponent(AZURE_VOICE_LIVE_API_KEY)}`;
 
     context.res = {
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            url: wsUrl, // Frontend should connect directly to this
-            token,      // Optionally send raw token if you want
-            region: AZURE_VOICE_REGION
-        })
+        body: JSON.stringify({ url: wsUrl })
     };
-}
-
+};
 
 // /api/negotiate/function.json//
 {
@@ -76,16 +56,17 @@ module.exports = async function (context, req) {
       "authLevel": "anonymous",
       "type": "httpTrigger",
       "direction": "in",
+      "name": "req",
       "route": "negotiate",
-      "methods": ["get", "post"]
+      "methods": ["get"]
     },
     {
       "type": "http",
-      "direction": "out"
+      "direction": "out",
+      "name": "res"
     }
   ]
 }
-
 
 //  /staticwebapp.config.json //
 {
@@ -98,3 +79,38 @@ module.exports = async function (context, req) {
 }
 
 
+//host.json//
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingExcludedTypes": "Request",
+      "samplingIncludedTypes": "Dependency",
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 5
+      }
+    }
+  },
+  "extensions": {
+    "http": {
+      "routePrefix": ""
+    }
+  }
+}
+
+
+//package.json//
+{
+  "name": "azure-staticwebapp-voice-live-proxy",
+  "version": "1.0.0",
+   "engines": {
+    "node": "18.x"
+  },
+  "description": "Azure Static Web App backend for Voice Live API WebSocket negotiation (API key over query string).",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
