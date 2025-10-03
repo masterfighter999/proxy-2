@@ -1,39 +1,37 @@
 /**
- * Azure Static Web App function to return the Azure Voice Live API websocket URL
- * with the API key injected via query string (never expose key to browser!).
+ * Azure Static Web App function for Voice Live API negotiation.
+ * Returns a WebSocket URL for the Voice Live API, with model and api-version.
  * 
- * Expects:
- *   - AZURE_VOICE_KEY (env)
- *   - AZURE_VOICE_REGION (env)
+ * Environment variables:
+ *   AZURE_VOICE_LIVE_ENDPOINT (e.g. https://your-resource.voice.azure.com)
+ *   AZURE_VOICE_LIVE_API_KEY
+ *   AZURE_VOICE_LIVE_MODEL (e.g. gpt-4o)
  */
 
 module.exports = async function (context, req) {
-    const AZURE_VOICE_KEY = process.env.AZURE_VOICE_KEY;
-    const AZURE_VOICE_REGION = process.env.AZURE_VOICE_REGION;
+    const AZURE_VOICE_LIVE_ENDPOINT = process.env.AZURE_VOICE_LIVE_ENDPOINT;
+    const AZURE_VOICE_LIVE_API_KEY = process.env.AZURE_VOICE_LIVE_API_KEY;
+    const AZURE_VOICE_LIVE_MODEL = process.env.AZURE_VOICE_LIVE_MODEL;
+    const API_VERSION = '2025-05-01-preview';
 
-    if (!AZURE_VOICE_KEY || !AZURE_VOICE_REGION) {
+    if (!AZURE_VOICE_LIVE_ENDPOINT || !AZURE_VOICE_LIVE_API_KEY || !AZURE_VOICE_LIVE_MODEL) {
         context.res = {
             status: 500,
-            body: "Azure Voice API KEY or REGION not configured."
+            body: "Missing Voice Live API endpoint, api-key or model."
         };
         return;
     }
 
-    // You may want to check for authenticated user here (optional)
-    // const userToken = req.query.token || req.headers["authorization"];
-    // if (!userToken) { ... }
-
-    // Compose the websocket endpoint for Voice Live API (per MS docs)
-    // Example: wss://<region>.api.speech.microsoft.com/voice/live/ws?api-key=YOUR_KEY
-    const wsUrl = `wss://${AZURE_VOICE_REGION}.api.speech.microsoft.com/voice/live/ws?api-key=${encodeURIComponent(AZURE_VOICE_KEY)}`;
+    const wsUrl = AZURE_VOICE_LIVE_ENDPOINT
+        .replace('https://', 'wss://')
+        .replace(/\/$/, '') +
+        `/voice-live/realtime?api-version=${API_VERSION}&model=${AZURE_VOICE_LIVE_MODEL}&api-key=${encodeURIComponent(AZURE_VOICE_LIVE_API_KEY)}`;
 
     context.res = {
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            url: wsUrl
-        })
+        body: JSON.stringify({ url: wsUrl })
     };
 };
