@@ -1,8 +1,18 @@
 {
+  "networking": {
+    "apiCors": {
+      "allowedOrigins": [
+        "chrome-extension://eblkjbifkjdndolidfpcllckffpakmdp"
+      ]
+    }
+  },
   "routes": [
     {
       "route": "/api/*",
-      "allowedOrigins": ["*"]
+      "methods": ["POST", "GET"],
+      "headers": {
+        "Access-Control-Allow-Origin": "chrome-extension://eblkjbifkjdndolidfpcllckffpakmdp"
+      }
     }
   ]
 }
