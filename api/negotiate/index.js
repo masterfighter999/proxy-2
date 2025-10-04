@@ -14,6 +14,19 @@ module.exports = async function (context, req) {
     const AZURE_VOICE_LIVE_MODEL = process.env.AZURE_VOICE_LIVE_MODEL;
     const API_VERSION = '2025-05-01-preview';
 
+    // CORS preflight handler
+    if (req.method === "OPTIONS") {
+        context.res = {
+            status: 204,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*"
+            }
+        };
+        return;
+    }
+
     if (!AZURE_VOICE_LIVE_ENDPOINT || !AZURE_VOICE_LIVE_API_KEY || !AZURE_VOICE_LIVE_MODEL) {
         context.res = {
             status: 500,
@@ -29,8 +42,10 @@ module.exports = async function (context, req) {
 
     context.res = {
         headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({ url: wsUrl })
     };
