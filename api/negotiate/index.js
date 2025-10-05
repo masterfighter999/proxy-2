@@ -41,7 +41,7 @@ module.exports = async function (context, req) {
     }
 
     // 3. Request token from Azure
-    const tokenEndpoint = `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+    const tokenEndpoint = `https://dubby-ai-foundary.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
     let token = null;
     try {
         token = await new Promise((resolve, reject) => {
