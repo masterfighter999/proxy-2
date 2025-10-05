@@ -10,7 +10,10 @@
     {
       "route": "/api/*",
       "methods": ["POST", "GET"],
-      "headers": {
+      "allowedRoles": [
+         "anonymous"      
+      ] ,
+      "globalheaders": {
         "Access-Control-Allow-Origin": "chrome-extension://eblkjbifkjdndolidfpcllckffpakmdp"
       }
     }

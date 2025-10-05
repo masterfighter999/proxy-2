@@ -70,10 +70,23 @@ module.exports = async function (context, req) {
 
 //  /staticwebapp.config.json //
 {
+  "networking": {
+    "apiCors": {
+      "allowedOrigins": [
+        "chrome-extension://eblkjbifkjdndolidfpcllckffpakmdp"
+      ]
+    }
+  },
   "routes": [
     {
       "route": "/api/*",
-      "allowedOrigins": ["*"]
+      "methods": ["POST", "GET"],
+      "allowedRoles": [
+         "anonymous"      
+      ] ,
+      "globalheaders": {
+        "Access-Control-Allow-Origin": "chrome-extension://eblkjbifkjdndolidfpcllckffpakmdp"
+      }
     }
   ]
 }
@@ -104,12 +117,16 @@ module.exports = async function (context, req) {
 {
   "name": "azure-staticwebapp-voice-live-proxy",
   "version": "1.0.0",
-   "engines": {
+  "engines": {
     "node": "18.x"
   },
   "description": "Azure Static Web App backend for Voice Live API WebSocket negotiation (API key over query string).",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "build": "mkdir -p build && cp -r public/* build/ || true",
+    "build:azure": "npm run build",
+    "start": "node ./api/negotiate/index.js"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {}
