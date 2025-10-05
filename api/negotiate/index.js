@@ -3,6 +3,7 @@
 // - Logs detailed errors for debugging (console + response)
 // - Returns 200 with { url } if success, 500 with diagnostic message if error
 
+const https = require('https');
 
 module.exports = async function (context, req) {
     const AZURE_VOICE_LIVE_ENDPOINT = process.env.AZURE_VOICE_LIVE_ENDPOINT;
