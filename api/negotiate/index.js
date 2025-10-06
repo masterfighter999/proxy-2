@@ -9,7 +9,7 @@ module.exports = async function (context, req) {
     const AZURE_VOICE_LIVE_ENDPOINT = process.env.AZURE_VOICE_LIVE_ENDPOINT;
     const AZURE_VOICE_LIVE_API_KEY = process.env.AZURE_VOICE_LIVE_API_KEY;
     const AZURE_VOICE_LIVE_MODEL = process.env.AZURE_VOICE_LIVE_MODEL;
-    const API_VERSION = '2025-05-01-preview';
+    const API_VERSION = '2025-10-01';
 
     // 1. Validate required env variables
     if (!AZURE_VOICE_LIVE_ENDPOINT || !AZURE_VOICE_LIVE_API_KEY || !AZURE_VOICE_LIVE_MODEL) {
