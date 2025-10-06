@@ -88,9 +88,9 @@ module.exports = async function (context, req) {
     // 4. Build ws URL (token as query param, never API key)
     try {
         const wsUrl = AZURE_VOICE_LIVE_ENDPOINT
-            .replace(/^https:\/\//, 'wss://')
+            .replace('https://', 'wss://')
             .replace(/\/$/, '') +
-            `/voice-live/realtime?api-version=${API_VERSION}&model=${encodeURIComponent(AZURE_VOICE_LIVE_MODEL)}&token=${encodeURIComponent(token)}`;
+            `/voice-live/realtime?api-version=${API_VERSION}&model=${AZURE_VOICE_LIVE_MODEL}&api-key=${encodeURIComponent(AZURE_VOICE_LIVE_API_KEY)}`;
 
         console.info(`[negotiate] Success: wsUrl built for region=${region}, model=${AZURE_VOICE_LIVE_MODEL}.`);
         context.res = {

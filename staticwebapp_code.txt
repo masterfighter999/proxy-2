@@ -10,7 +10,7 @@
 │   └── index.html              # (optional)
 └── README.md                   # (optional, for docs)
 
-
+// /api/negotiate/index.js//
 /**
  * Azure Static Web App function for Voice Live API negotiation.
  * Returns a WebSocket URL for the Voice Live API, with model and api-version.
